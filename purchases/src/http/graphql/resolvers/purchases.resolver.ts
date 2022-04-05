@@ -7,6 +7,7 @@ import {
   ResolveField,
   Resolver,
 } from '@nestjs/graphql';
+import { CustomerService } from '../../../services/customer.service';
 import { ProductServices } from '../../../services/products.service';
 import { PurchaseServices } from '../../../services/purchases.service';
 import { AuthorizationGuard } from '../../auth/authorization.guard';
@@ -21,6 +22,7 @@ export class PurchasesResolver {
   constructor(
     private purchaseServices: PurchaseServices,
     private productServices: ProductServices,
+    private customerService: CustomerService,
   ) {}
 
   @Query(() => [Purchase])
@@ -37,12 +39,20 @@ export class PurchasesResolver {
 
   @Mutation(() => Purchase)
   @UseGuards(AuthorizationGuard)
-  createPurchase(
+  async createPurchase(
     @Args('data') data: CreatePurchaseInput,
     @CurrentUser() user: AuthUser,
   ) {
+    let customer = await this.customerService.getCustomerByAuthUserId(user.sub);
+
+    if (!customer) {
+      customer = await this.customerService.createCustomer({
+        authUserId: user.sub,
+      });
+    }
+
     return this.purchaseServices.createPurchase({
-      customerId: user.sub,
+      customerId: customer.id,
       productId: data.productId,
     });
   }
