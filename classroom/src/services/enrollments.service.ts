@@ -6,6 +6,13 @@ export class EnrollmentsService {
   constructor(private prisma: PrismaService) {}
 
   listAllEnrollments() {
-    return this.prisma.enrollment.findMany();
+    return this.prisma.enrollment.findMany({
+      where: {
+        canceledAt: null,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
   }
 }
