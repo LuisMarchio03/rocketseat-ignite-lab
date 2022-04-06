@@ -23,7 +23,7 @@ model Course {
   id String @id @default(uuid())
 
   title      String
-  slug       String
+  slug       String       @unique
   enrolledOn Enrollment[]
 
   createdAt DateTime @default(now())
