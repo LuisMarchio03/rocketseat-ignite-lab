@@ -3,13 +3,15 @@ import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { DatabaseModule } from '../database/database.module';
 import { ApolloDriver } from '@nestjs/apollo';
+
+import { StudentsService } from '../services/students.service';
+import { EnrollmentsService } from '../services/enrollments.service';
+import { CoursesService } from '../services/courses.service';
+import { EnrollmentsResolver } from './graphql/resolvers/enrollments.resolver';
+import { CoursesResolver } from './graphql/resolvers/courses.resolver';
+import { StudentsResolver } from './graphql/resolvers/students.resolver';
+
 import path from 'node:path';
-import { CourseResolver } from './graphql/resolvers/course.resolver';
-import { EnrollmentResolver } from './graphql/resolvers/enrollment.resolver';
-import { StudentResolver } from './graphql/resolvers/students.resolver';
-import { CourseService } from '../services/course.service';
-import { StudentService } from '../services/students.service';
-import { EnrollmentService } from '../services/enrollment.service';
 
 @Module({
   imports: [
@@ -21,13 +23,13 @@ import { EnrollmentService } from '../services/enrollment.service';
     }),
   ],
   providers: [
-    CourseResolver,
-    EnrollmentResolver,
-    StudentResolver,
+    CoursesResolver,
+    EnrollmentsResolver,
+    StudentsResolver,
 
-    CourseService,
-    EnrollmentService,
-    StudentService,
+    CoursesService,
+    EnrollmentsService,
+    StudentsService,
   ],
 })
 export class HttpModule {}

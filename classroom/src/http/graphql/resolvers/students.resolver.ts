@@ -5,7 +5,7 @@ import { AuthorizationGuard } from '../../auth/authorization.guard';
 import { Student } from '../models/student';
 
 @Resolver(() => Student)
-export class StudentResolver {
+export class StudentsResolver {
   constructor(private studentsService: StudentsService) {}
 
   @Query(() => [Student])
