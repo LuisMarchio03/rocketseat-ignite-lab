@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../database/prisma/prisma.service';
+import { KafkaService } from '../messaging/kafka/kafka.service';
 
 interface ICreatePurchasesParams {
   customerId: string;
@@ -8,7 +9,7 @@ interface ICreatePurchasesParams {
 
 @Injectable()
 export class PurchaseServices {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private kafka: KafkaService) {}
 
   async listAllPurchases() {
     return this.prisma.purchases.findMany({
@@ -27,21 +28,40 @@ export class PurchaseServices {
   }
 
   async createPurchase({ customerId, productId }: ICreatePurchasesParams) {
-    const productAlreadyExists = await this.prisma.product.findUnique({
+    const product = await this.prisma.product.findUnique({
       where: {
         id: productId,
       },
     });
 
-    if (productAlreadyExists) {
-      throw new Error('Product already exists');
+    if (!product) {
+      throw new Error('Product not found.');
     }
 
-    return this.prisma.purchases.create({
+    const purchase = await this.prisma.purchases.create({
       data: {
         customerId,
         productId,
       },
     });
+
+    const customer = await this.prisma.customer.findUnique({
+      where: {
+        id: customerId,
+      },
+    });
+
+    this.kafka.emit('purchase.new-purchase', {
+      customer: {
+        authUserId: customer.authUserId,
+      },
+      product: {
+        id: productId,
+        title: product.title,
+        slug: product.slug,
+      },
+    });
+
+    return purchase;
   }
 }
