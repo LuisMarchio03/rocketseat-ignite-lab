@@ -10,8 +10,8 @@ import { Enrollment } from '../models/enrollment';
 export class EnrollmentsResolver {
   constructor(
     private enrollmentsService: EnrollmentsService,
-    private studentService: StudentsService,
-    private courseService: CoursesService,
+    private coursesService: CoursesService,
+    private studentsService: StudentsService,
   ) {}
 
   @Query(() => [Enrollment])
@@ -20,13 +20,13 @@ export class EnrollmentsResolver {
     return this.enrollmentsService.listAllEnrollments();
   }
 
-  @ResolveField(() => Enrollment)
+  @ResolveField()
   student(@Parent() enrollment: Enrollment) {
-    return this.studentService.getStudentById(enrollment.studentId);
+    return this.studentsService.getStudentById(enrollment.studentId);
   }
 
-  @ResolveField(() => Enrollment)
+  @ResolveField()
   course(@Parent() enrollment: Enrollment) {
-    return this.courseService.getCourseById(enrollment.courseId);
+    return this.coursesService.getCourseById(enrollment.courseId);
   }
 }

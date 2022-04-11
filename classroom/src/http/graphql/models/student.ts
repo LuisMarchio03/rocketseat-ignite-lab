@@ -12,5 +12,5 @@ export class Student {
   authUserId: string;
 
   @Field(() => [Enrollment])
-  enrollment: Enrollment;
+  enrollments: Enrollment[];
 }

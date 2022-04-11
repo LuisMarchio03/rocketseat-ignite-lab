@@ -23,11 +23,11 @@ export interface PurchaseCreatedPayload {
 export class PurchaseController {
   constructor(
     private studentsService: StudentsService,
-    private enrollmentsService: EnrollmentsService,
     private coursesService: CoursesService,
+    private enrollmentsService: EnrollmentsService,
   ) {}
 
-  @EventPattern('purchase.new-purchase')
+  @EventPattern('purchases.new-purchase')
   async purchaseCreated(@Payload('value') payload: PurchaseCreatedPayload) {
     let student = await this.studentsService.getStudentByAuthUserId(
       payload.customer.authUserId,
@@ -46,13 +46,12 @@ export class PurchaseController {
     if (!course) {
       course = await this.coursesService.createCourse({
         title: payload.product.title,
-        slug: payload.product.slug,
       });
     }
 
     await this.enrollmentsService.createEnrollment({
-      studentId: student.id,
       courseId: course.id,
+      studentId: student.id,
     });
   }
 }
